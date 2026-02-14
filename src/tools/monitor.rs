@@ -2,10 +2,13 @@ use crate::connection::Connection;
 use crate::tools::schema::query_to_markdown;
 
 pub async fn active_sessions(conn: &mut Connection) -> Result<String, String> {
-    let sql = "SELECT session_id, login_name, status, command, wait_type, \
-               blocking_session_id, cpu_time, reads, writes \
-               FROM sys.dm_exec_sessions WHERE is_user_process = 1 \
-               ORDER BY cpu_time DESC";
+    let sql = "SELECT s.session_id, s.login_name, s.status, \
+               r.command, r.wait_type, r.blocking_session_id, \
+               s.cpu_time, s.reads, s.writes \
+               FROM sys.dm_exec_sessions s \
+               LEFT JOIN sys.dm_exec_requests r ON s.session_id = r.session_id \
+               WHERE s.is_user_process = 1 \
+               ORDER BY s.cpu_time DESC";
     query_to_markdown(conn, sql, None).await
 }
 
@@ -87,9 +90,9 @@ pub async fn server_info(conn: &mut Connection) -> Result<String, String> {
     let sql = r#"SELECT
     @@VERSION AS [version],
     @@SERVERNAME AS [server_name],
-    SERVERPROPERTY('Edition') AS [edition],
-    SERVERPROPERTY('ProductVersion') AS [product_version],
-    SERVERPROPERTY('ProductLevel') AS [product_level],
+    CAST(SERVERPROPERTY('Edition') AS nvarchar(256)) AS [edition],
+    CAST(SERVERPROPERTY('ProductVersion') AS nvarchar(256)) AS [product_version],
+    CAST(SERVERPROPERTY('ProductLevel') AS nvarchar(256)) AS [product_level],
     (SELECT compatibility_level FROM sys.databases WHERE name = DB_NAME()) AS [compatibility_level]"#;
 
     query_to_markdown(conn, sql, None).await

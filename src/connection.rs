@@ -37,18 +37,17 @@ impl Connection {
             config.database(db);
         }
 
-        let addr = config.get_addr().to_string();
-        eprintln!("Connecting to {}", addr);
+        eprintln!("Connecting to {}:{}", self.args.host, self.args.port);
 
-        let tcp = TcpStream::connect(config.get_addr())
-            .await
-            .map_err(|e| format!("TCP connection failed: {}", e))?;
-        tcp.set_nodelay(true)
-            .map_err(|e| format!("set_nodelay failed: {}", e))?;
-
-        let client = Client::connect(config, tcp.compat_write())
-            .await
-            .map_err(|e| format!("TDS connection failed: {}", e))?;
+        let client = Client::connect_with_redirect(config, |host, port| async move {
+            let addr = format!("{}:{}", host, port);
+            eprintln!("Connecting to {}", addr);
+            let tcp = TcpStream::connect(&addr).await?;
+            tcp.set_nodelay(true)?;
+            Ok(tcp.compat_write())
+        })
+        .await
+        .map_err(|e| format!("TDS connection failed: {}", e))?;
 
         eprintln!("Connected successfully");
         self.client = Some(client);
