@@ -6,14 +6,30 @@ Built on [tabby](https://github.com/copycatdb/tabby) (pure Rust TDS 7.4+), prowl
 
 Single binary. Zero external dependencies. Just point it at your SQL Server and go.
 
+## Installation
+
+### Pre-built binaries (recommended)
+
+Download the latest release for your platform:
+- [Linux x64](https://github.com/copycatdb/prowl/releases/latest/download/prowl-x86_64-unknown-linux-gnu) | [Linux ARM64](https://github.com/copycatdb/prowl/releases/latest/download/prowl-aarch64-unknown-linux-gnu)
+- [macOS x64](https://github.com/copycatdb/prowl/releases/latest/download/prowl-x86_64-apple-darwin) | [macOS Apple Silicon](https://github.com/copycatdb/prowl/releases/latest/download/prowl-aarch64-apple-darwin)
+- [Windows x64](https://github.com/copycatdb/prowl/releases/latest/download/prowl-x86_64-pc-windows-msvc.exe) | [Windows ARM64](https://github.com/copycatdb/prowl/releases/latest/download/prowl-aarch64-pc-windows-msvc.exe)
+
+Or use curl:
+```bash
+# Linux/macOS
+curl -fsSL https://github.com/copycatdb/prowl/releases/latest/download/prowl-$(uname -s | tr '[:upper:]' '[:lower:]')-$(uname -m) -o prowl
+chmod +x prowl
+```
+
+### From source
+```bash
+cargo install --git https://github.com/copycatdb/prowl.git
+```
+
 ## Quick Start
 
 ```bash
-# Build
-git clone https://github.com/copycatdb/prowl.git
-cd prowl
-cargo build --release
-
 # Configure
 export TDSSERVER=localhost
 export TDSPORT=1433
@@ -21,12 +37,12 @@ export TDSUSER=sa
 export TDSPASSWORD=YourPassword123!
 
 # Run (stdin/stdout JSON-RPC — connect via MCP client)
-./target/release/prowl
+prowl
 ```
 
 ### Claude Desktop
 
-Add to your `claude_desktop_config.json`:
+Add to `claude_desktop_config.json`:
 
 ```json
 {
@@ -39,20 +55,16 @@ Add to your `claude_desktop_config.json`:
 }
 ```
 
-### VS Code (GitHub Copilot)
+### VS Code / GitHub Copilot
 
-Add to your `.vscode/mcp.json`:
+Add to `.vscode/settings.json`:
 
 ```json
 {
-  "servers": {
+  "github.copilot.chat.mcpServers": {
     "prowl": {
       "command": "/path/to/prowl",
-      "env": {
-        "TDSSERVER": "localhost",
-        "TDSUSER": "sa",
-        "TDSPASSWORD": "YourPassword123!"
-      }
+      "args": ["--host", "localhost", "--user", "sa", "--password", "yourpass"]
     }
   }
 }
