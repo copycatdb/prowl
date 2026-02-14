@@ -11,7 +11,7 @@ pub async fn query_to_markdown(
         Err(_) => conn.reconnect().await?,
     };
 
-    let params: Vec<&dyn tabby::IntoSql> = vec![];
+    let params: Vec<&dyn claw::IntoSql> = vec![];
     let stream = client
         .execute(sql, &params)
         .await

@@ -1,4 +1,4 @@
-use tabby::{AuthMethod, Client, Config};
+use claw::{AuthMethod, Client, Config};
 use tokio::net::TcpStream;
 use tokio_util::compat::TokioAsyncWriteCompatExt;
 

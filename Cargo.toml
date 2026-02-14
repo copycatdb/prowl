@@ -14,7 +14,7 @@ name = "prowl"
 path = "src/main.rs"
 
 [dependencies]
-tabby = { git = "https://github.com/copycatdb/tabby.git", branch = "main" }
+claw = { git = "https://github.com/copycatdb/claw.git", branch = "main" }
 tokio = { version = "1", features = ["rt-multi-thread", "macros", "io-util", "io-std", "net", "sync"] }
 tokio-util = { version = "0.7", features = ["compat"] }
 serde = { version = "1", features = ["derive"] }
